@@ -1,14 +1,14 @@
 import React from 'react';
-import './App.css';
+import './styles/App.css';
 import UsersManagment from './components/UsersManagment'
 
 function App() {
   return (
     <div className="App">
     <header className="App-header">
-      <h1>
+      <h2>
         Users Managment
-      </h1>
+      </h2>
       <div>
         <UsersManagment />
       </div>

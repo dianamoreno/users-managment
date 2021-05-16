@@ -1,6 +1,6 @@
 {
   "name": "users-managment",
-  "version": "1.0",
+  "version": "0.1.0",
   "author": "Diana Moreno",
   "private": true,
   "dependencies": {

@@ -4,7 +4,7 @@ export interface UsersManagmentProps{
 
 export interface UsersManagmentState{
     counter: number;
-    users:any[];
+    users:userData[];
 }
 
 export interface userData{

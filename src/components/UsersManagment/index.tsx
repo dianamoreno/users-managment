@@ -1,5 +1,5 @@
 import React from 'react';
-import { userDataAPI, UsersManagmentProps, UsersManagmentState } from '../../interfaces/UsersManagment/';
+import { userDataAPI, userData, UsersManagmentProps, UsersManagmentState } from '../../interfaces/UsersManagment/';
 import axios from 'axios'; 
 import {Button} from '../Button';
 
@@ -16,39 +16,25 @@ class UsersManagment extends React.Component<UsersManagmentProps, UsersManagment
 
     }
 
-    fetchUserData = (action: string) =>{
-        console.log('fetchUserData action='+action)
-        let _users = this.state.users;
+    fetchUserData = async (action: string) =>{
+console.log("fetchUserData action:"+action)
+      
 
-        if((action === 'add' && this.state.counter > 1) || action === 'init'){
-            axios.get('https://reqres.in/api/users/'+this.state.counter)
-            .then(response => {
-                const userDataAPI = response.data as userDataAPI;
-                let arr = [userDataAPI.data.avatar, userDataAPI.data.first_name, userDataAPI.data.last_name]
-                _users.push(arr)
+            const response = await axios.get('https://reqres.in/api/users/'+this.state.counter)            
+            const { data } = response.data as userDataAPI;
+         
+            this.setState((prev)=>{
+                
+                return {
+                    users : [
+                        ...prev.users,
+                        data
+                    ]
+                }
+            })            
+            
 
-                this.setState(()=>{
-                    
-                    return {
-                        users : _users
-                    }
-                })            
-            })
-
-        } else {
-            const index = _users.length -1 ;
-            if (index > 0) {
-                _users.splice(index, 1);
-
-                this.setState(()=>{
-                    return {
-                        users : _users
-                    }
-                })       
-            }
-        }
-
-        console.log("users:",_users)
+        
     }
 
     componentDidMount(){
@@ -57,13 +43,18 @@ class UsersManagment extends React.Component<UsersManagmentProps, UsersManagment
         
     }
 
-    componentDidUpdate(prevProps:UsersManagmentProps, prevState: UsersManagmentState, snapshot: any){
-        console.log('componentDidUpdate')
- 
+    hasUserAlreadyFetched = (users: userData[], counter: number) =>{
+        const result = (users.filter(user => user.id === counter))[0];
+        return !!result;
+    }
 
+    componentDidUpdate(prevProps:UsersManagmentProps, prevState: UsersManagmentState, snapshot: any){
+          
+        const {users, counter} = this.state;
         //ejemplo de cargar mas info cada vez que el estado del componente cambia:
         //la validacion de los estados es importante para prevenir que no se quede en un loop de actualizacion
-        if(this.state.counter > 0 && this.state.counter < 11 && prevState.counter !== this.state.counter){
+        if( prevState.counter !== counter && !this.hasUserAlreadyFetched(users,counter)){
+            console.log("if componentDidUpdate")
             const action = (this.state.counter > prevState.counter)? "add" : "reduce";
             this.fetchUserData(action);
         }
@@ -71,8 +62,6 @@ class UsersManagment extends React.Component<UsersManagmentProps, UsersManagment
 
     
     increaseCounter = () => {
-        console.log('increaseCounter')
-
         if(this.state.counter < 10){
             this.setState((prev)=>{
                 return {
@@ -84,17 +73,34 @@ class UsersManagment extends React.Component<UsersManagmentProps, UsersManagment
     }
 
     decreaseCounter = () => {
-        if(this.state.counter > 1){
-            this.setState((prev)=>{
-                return {
-                    counter: prev.counter - 1
-                }
-           })
-        }
+        const {counter} = this.state
+
+        counter > 1 && this.setState((prev)=>{
+            return {
+                counter: prev.counter - 1
+            }
+        })
+        
+    }
+
+    renderUsers = () =>{
+        const {users, counter} = this.state;
+
+       return users.filter(user => user.id <= counter).map(({avatar, first_name, last_name}, index) => {
+            let key = "userid-"+index
+            return (
+                <li key={key}>
+                  <div className='user-content'>
+                    <div className='left div-r'><img src={avatar} width="40" alt={first_name}></img></div>
+                    <div className='left div-l'>{first_name+" "+last_name}</div>
+                </div>
+                </li>
+            )
+        })
     }
 
     render(){
-        const { counter, users } = this.state;
+        const { counter } = this.state;
 
         return (
             <div>
@@ -104,18 +110,7 @@ class UsersManagment extends React.Component<UsersManagmentProps, UsersManagment
                 <hr/>
                 
                 <ul>
-                {users && users.map((data, index) => {
-                    console.log("*****",data)
-                    let key = "userid-"+index
-                    return (
-                        <li key={key}>
-                          <div className='user-content'>
-                            <div className='left div-r'><img src={data[0]} width="40" alt={data[1]}></img></div>
-                            <div className='left div-l'>{data[1]+" "+data[2]}</div>
-                        </div>
-                        </li>
-                    )
-                })}
+                    {this.renderUsers()}
                 </ul>
             </div>
         )

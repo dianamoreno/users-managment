@@ -1,6 +1,6 @@
 import React from 'react';
 import {ButtonProps} from '../../interfaces/Button/'
-import '../../styles/index.css';
+import '../../styles/button.css';
 
 export const Button: React.FC<ButtonProps> = (props) => {
     const style = props.type;
