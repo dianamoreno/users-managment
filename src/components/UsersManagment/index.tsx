@@ -16,14 +16,12 @@ class UsersManagment extends React.Component<UsersManagmentProps, UsersManagment
 
     }
 
-    fetchUserData = async (action: string) =>{
-console.log("fetchUserData action:"+action)
-      
+    fetchUserData = async () =>{
 
             const response = await axios.get('https://reqres.in/api/users/'+this.state.counter)            
             const { data } = response.data as userDataAPI;
          
-            this.setState((prev)=>{
+            /*this.setState((prev)=>{
                 
                 return {
                     users : [
@@ -31,7 +29,10 @@ console.log("fetchUserData action:"+action)
                         data
                     ]
                 }
-            })            
+            })*/            
+            this.setState({
+                users: [...this.state.users, data]
+            })
             
 
         
@@ -39,7 +40,7 @@ console.log("fetchUserData action:"+action)
 
     componentDidMount(){
        
-       this.fetchUserData("init")
+       this.fetchUserData()
         
     }
 
@@ -55,8 +56,7 @@ console.log("fetchUserData action:"+action)
         //la validacion de los estados es importante para prevenir que no se quede en un loop de actualizacion
         if( prevState.counter !== counter && !this.hasUserAlreadyFetched(users,counter)){
             console.log("if componentDidUpdate")
-            const action = (this.state.counter > prevState.counter)? "add" : "reduce";
-            this.fetchUserData(action);
+            this.fetchUserData();
         }
     }
 
