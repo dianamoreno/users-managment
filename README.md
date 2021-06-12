@@ -1,2 +1,2 @@
 # users-managment
-App de gestión de usuarios con React y TypeSrcipt
+App de gestión de usuarios con Reactjs y TypeSrcipt
